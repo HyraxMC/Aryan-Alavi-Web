@@ -1,180 +1,292 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>آرین علوی | خوش آمدید</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HyraxBot Mini App</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #00c2ff;
+      --card-glass: rgba(255, 255, 255, 0.22);
+      --border-glass: rgba(255, 255, 255, 0.28);
+      --nav-glass: rgba(255, 255, 255, 0.18);
+      --bg-image: url('day-bg.jpg');
+    }
+    [data-theme="dark"] {
+      --bg: #0b1220;
+      --text: #f7fafc;
+      --muted: #a3a3a3;
+      --accent: #00c2ff;
+      --card-glass: rgba(16, 20, 28, 0.45);
+      --border-glass: rgba(255, 255, 255, 0.16);
+      --nav-glass: rgba(255, 255, 255, 0.12);
+      --bg-image: url('night-bg.jpg');
+    }
 
-  <!-- SEO -->
-  <meta name="description" content="رزومه و مهارت‌های آرین علوی: توسعه وب، بات تلگرام، طراحی مدرن گلس‌مورفیسم.">
-  <meta name="keywords" content="آرین علوی, توسعه وب, بات تلگرام, HTML, CSS, JavaScript, WordPress, Python">
-  <link rel="canonical" href="https://example.com">
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      background-image: var(--bg-image);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: background 0.4s ease, color 0.3s ease, background-image 0.6s ease;
+    }
 
-  <!-- Font -->
-  <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.2/Vazirmatn.min.css" rel="stylesheet">
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--nav-glass);
+      border-bottom: 1px solid var(--border-glass);
+      backdrop-filter: blur(12px) saturate(120%);
+    }
+    header img.logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+    header .titles { display: flex; flex-direction: column; }
+    header .title { font-weight: 800; letter-spacing: 0.2px; }
+    header .subtitle { font-size: 12px; color: var(--muted); }
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css">
+    .theme-toggle {
+      position: fixed;
+      inset-inline-end: 12px;
+      inset-block-start: 12px;
+      z-index: 10;
+      background: var(--card-glass);
+      color: var(--text);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 8px 12px;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 26px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.3s ease, background 0.3s ease;
+    }
+    .theme-toggle:hover { transform: translateY(-1px) scale(1.03); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+
+    main.section {
+      flex: 1;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-content: start;
+    }
+    @media (min-width: 420px) { main.section { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 720px) { main.section { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .card {
+      position: relative;
+      background: var(--card-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.26);
+      backdrop-filter: blur(14px) saturate(130%);
+      overflow: hidden;
+      animation: glassFadeIn 460ms ease both;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -20% -20% auto auto;
+      width: 60%;
+      height: 60%;
+      background: radial-gradient(120px 60px at 70% 20%, rgba(255,255,255,0.25), transparent 70%);
+      filter: blur(20px);
+      transform: rotate(8deg);
+      pointer-events: none;
+    }
+    .card h3 { margin: 0 0 10px; font-size: 15.5px; font-weight: 800; }
+    .card p { margin: 0 0 12px; font-size: 12.5px; color: var(--muted); }
+
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), #6be6ff);
+      color: #0b0f14;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      box-shadow: 0 6px 20px rgba(0,194,255,0.35);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.26s ease, filter 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px) scale(1.04); box-shadow: 0 10px 28px rgba(0,194,255,0.45); filter: saturate(115%); }
+    .btn:active { transform: translateY(0) scale(0.98); box-shadow: 0 5px 18px rgba(0,194,255,0.35); }
+
+    nav.footer {
+      position: sticky;
+      bottom: 0;
+      z-index: 4;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 10px;
+      background: var(--nav-glass);
+      border-top: 1px solid var(--border-glass);
+      backdrop-filter: blur(12px) saturate(120%);
+    }
+    .footer-btn {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid var(--border-glass);
+      color: var(--text);
+      font-weight: 700;
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.22);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+    .footer-btn:hover { transform: translateY(-1px) scale(1.03); background: rgba(255,255,255,0.22); }
+    .footer-btn.active { background: rgba(255,255,255,0.26); box-shadow: 0 12px 34px rgba(0,0,0,0.28); }
+
+    .notify {
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92%;
+      max-width: 420px;
+      background: var(--card-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.25);
+      backdrop-filter: blur(12px);
+      padding: 12px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--text);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .notify.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .notify .progress {
+      height: 4px;
+      background: var(--accent);
+      border-radius: 4px;
+      margin-top: 8px;
+      width: 0%;
+      transition: width linear;
+    }
+
+    @keyframes glassFadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); filter: blur(2px); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
+    }
+
+    .banner {
+      position: fixed;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92%;
+      max-width: 480px;
+      background: #ffefef;
+      color: #7a1d1d;
+      border: 1px solid #e5b7b7;
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      font-weight: 700;
+      z-index: 1000;
+      display: none;
+    }
+  </style>
 </head>
-<body>
+<body data-theme="light">
+  <button class="theme-toggle" id="themeToggle" title="تغییر تم">🌙 تم شب</button>
 
-  <!-- Background & Orb -->
-  <div class="theme-image" aria-hidden="true"></div>
-  <div class="orb" aria-hidden="true"></div>
-
-  <!-- Header -->
   <header>
-    <nav class="nav">
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <span>آرین علوی</span>
-      </div>
-
-      <!-- Desktop Navigation -->
-      <ul class="desktop-nav">
-        <li><a href="#about">درباره من</a></li>
-        <li><a href="#skills">مهارت‌ها</a></li>
-        <li><a href="#education">تحصیلات</a></li>
-        <li><a href="#contact">تماس</a></li>
-      </ul>
-      <button id="menuToggle" class="hamburger" aria-label="Toggle menu">
-        <span class="bar top"></span>
-        <span class="bar middle"></span>
-        <span class="bar bottom"></span>
-      </button>
-      <!-- Theme Toggle -->
-      <div class="nav-actions">
-        <button class="btn theme-toggle" id="themeToggle">🌖🌕</button>
-      </div>
-    </nav>
+    <img src="logo.png" class="logo" alt="HyraxBot Logo" />
+    <div class="titles">
+      <div class="title">HyraxBot Mini App</div>
+      <div class="subtitle">اجرای قابلیت‌ها با رابط شیشه‌ای مدرن</div>
+    </div>
   </header>
-<!-- Mobile Hamburger -->
-      <!-- Mobile Menu -->
-      <nav id="mobileMenu" class="mobile-nav">
-        <ul>
-          <li><a href="#about">درباره من</a></li>
-          <li><a href="#skills">مهارت‌ها</a></li>
-          <li><a href="#education">تحصیلات</a></li>
-          <li><a href="#contact">تماس</a></li>
-        </ul>
-      </nav>
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="wrap">
-      <div class="hero-card glass fade-in">
-        <div class="avatar" style="background-image: url('img/avat.png');" aria-hidden="true"></div>
-        <h1>آرین علوی</h1>
-        <p class="muted">خوش آمدید 🌟</p>
-        <div class="tags">
-          <span class="tag">Python</span>
-          <span class="tag">JavaScript</span>
-          <span class="tag">HTML/CSS</span>
-          <span class="tag">WordPress</span>
-          <span class="tag">Unity</span>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- About Section -->
-  <section id="about">
-    <div class="wrap">
-      <div class="glass fade-in" style="padding:22px">
-        <h2>درباره من</h2>
-        <p>دانشجوی کاردانی نرم‌افزار؛ تمرکز روی توسعه ترند ترین پروژه ها و علاقه‌مند به یادگیری </p>
-        <p class="muted">آماده همکاری به صورت پاره‌وقت</p>
-        <div class="proj-actions" style="margin-top:8px">
-          <a class="btn" href="https://github.com/HyraxMC" target="_blank">گیت‌هاب</a>
-          <a class="btn" href="mailto:arian.s.alavi@gmail.com">ایمیل</a>
-          <a class="btn" href="tel:+989106661905">تماس</a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <main class="section" id="content"></main>
 
-  <!-- Skills Section -->
-  <section id="skills">
-    <div class="wrap">
-      <h2 style="margin-bottom:12px">مهارت‌ها</h2>
-      <div class="grid cols-3">
+  <nav class="footer">
+    <button class="footer-btn active" data-section="games">🎮 بازی‌ها</button>
+    <button class="footer-btn" data-section="tools">🛠 ابزارها</button>
+    <button class="footer-btn" data-section="general">📂 عمومی</button>
+  </nav>
 
-        <!-- Skill Cards -->
-        <div class="glass tilt-3d">
-          <h3>Python 25% | مقدماتی</h3>
-          <div class="meter"><span style="width:25%"></span></div>
-          <p class="muted">ربات تلگرامی هیراکس بات</p>
-          <a href="https://t.me/HyraxMC_bot" target="_blank" class="btn btn-primary">مشاهده</a>
-        </div>
+  <div id="notify" class="notify" aria-live="polite" aria-atomic="true">
+    <div id="notifyText">درخواست ارسال شد ✅</div>
+    <div class="progress" id="notifyProgress"></div>
+  </div>
 
-        <div class="glass tilt-3d">
-          <h3>JavaScript 0% | استارتر</h3>
-          <div class="meter"><span style="width:2%"></span></div>
-          <p class="muted">شروع یادگیری برای حرفه‌ای‌تر شدن سایت‌ها</p>
-        </div>
+  <div id="banner" class="banner">❌ این صفحه خارج از تلگرام باز شده است. لطفاً از داخل ربات و دکمه Mini App باز کنید.</div>
 
-        <div class="glass tilt-3d">
-          <h3>HTML/CSS 40% | متوسط</h3>
-          <div class="meter"><span style="width:40%"></span></div>
-          <p class="muted">تسلط متوسط به HTML و CSS</p>
-        </div>
+<script>
+  // گرفتن آبجکت WebApp
+  const tg = window.Telegram.WebApp;
 
-        <div class="glass tilt-3d">
-          <h3>WordPress 80% | حرفه ای</h3>
-          <div class="meter"><span style="width:80%"></span></div>
-          <p class="muted">تجربه طراحی وبسایت فروشگاهی و گیمینگ با المنتور و افزونه‌ها</p>
-        </div>
+  // آماده‌سازی WebApp
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    console.log("[MiniApp] WebApp آماده شد. initData:", tg.initData || "(خالی)");
+  } else {
+    alert("❌ WebApp API در دسترس نیست. باید از داخل تلگرام باز شود.");
+  }
 
-        <div class="glass tilt-3d">
-          <h3>Unity / C# 50% | متوسط</h3>
-          <div class="meter"><span style="width:50%"></span></div>
-          <p class="muted">در حال ساخت بازی با یونیتی | با زبان C# در سطح مقدماتی آشنا هستم</p>
-        </div>
+  // دکمه تست برای ارسال داده ساده
+  const testBtn = document.createElement("button");
+  testBtn.textContent = "🔎 تست ارسال داده";
+  testBtn.className = "btn";
+  document.body.appendChild(testBtn);
 
-      </div>
-    </div>
-  </section>
+  testBtn.addEventListener("click", () => {
+    if (!tg || !tg.sendData) {
+      alert("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.");
+      return;
+    }
+    try {
+      tg.sendData("hello from miniapp");
+      alert("✅ داده تست ارسال شد");
+      console.log("[MiniApp] Test data sent.");
+    } catch (err) {
+      console.error("[MiniApp] sendData failed:", err);
+      alert("❌ ارسال تست ناموفق بود");
+    }
+  });
 
-  <!-- Education Section -->
-  <section id="education">
-    <div class="wrap">
-      <h2 style="margin-bottom:12px">تحصیلات</h2>
-      <div class="grid cols-2">
-        <div class="glass tilt-3d">
-          <h3>درحال تحصیل در دانشکده شریعتی — کاردانی کامپیوتر نرم‌افزار</h3>
-        </div>
-        <div class="glass tilt-3d">
-          <h3>خودآموزی پروژه‌محور</h3>
-          <p class="muted">به دنبال سلف استادی با پروژه های چالش بر انگیز کار میکنم</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section id="contact">
-    <div class="wrap">
-      <h2 style="margin-bottom:12px">تماس</h2>
-      <div class="glass fade-in" style="padding:20px">
-        <form class="contact-form" onsubmit="return submitForm(event)">
-          <div><label for="name">شماره تماس: 09106661905</label></div>
-          <div><label for="email">ایمیل: arian.s.alavi@gmail.com</label></div>
-          <div style="display:flex; gap:10px; align-items:center">
-            <span id="formStatus" class="muted"></span>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <span id="year"></span> Copyright © Aryan Alavi
-    <p>Last Update 1404/8/11 v1.0.2</p>
-  </footer>
-
-  <!-- Scripts -->
-  <script src="script.js" defer></script>
+  // تابع اجرای ماژول‌ها
+  function exec(section, command) {
+    if (!tg || !tg.sendData) {
+      alert("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.");
+      return;
+    }
+    const payload = { type: "exec", section, command, initData: tg.initData || "" };
+    tg.sendData(JSON.stringify(payload));
+    alert("✅ درخواست اجرا ارسال شد");
+    console.log("[MiniApp] exec sent:", payload);
+  }
+</script>
 </body>
-
 </html>
-
