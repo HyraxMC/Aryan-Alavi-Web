@@ -192,11 +192,6 @@
       transition: width linear;
     }
 
-    @keyframes glassFadeIn {
-      from { opacity: 0; transform: translateY(10px) scale(0.98); filter: blur(2px); }
-      to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
-    }
-
     .banner {
       position: fixed;
       top: 56px;
@@ -213,6 +208,11 @@
       font-weight: 700;
       z-index: 1000;
       display: none;
+    }
+
+    @keyframes glassFadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); filter: blur(2px); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
     }
   </style>
 </head>
@@ -242,51 +242,192 @@
 
   <div id="banner" class="banner">❌ این صفحه خارج از تلگرام باز شده است. لطفاً از داخل ربات و دکمه Mini App باز کنید.</div>
 
-<script>
-  // گرفتن آبجکت WebApp
-  const tg = window.Telegram.WebApp;
-
-  // آماده‌سازی WebApp
-  if (tg) {
-    tg.ready();
-    tg.expand();
-    console.log("[MiniApp] WebApp آماده شد. initData:", tg.initData || "(خالی)");
-  } else {
-    alert("❌ WebApp API در دسترس نیست. باید از داخل تلگرام باز شود.");
-  }
-
-  // دکمه تست برای ارسال داده ساده
-  const testBtn = document.createElement("button");
-  testBtn.textContent = "🔎 تست ارسال داده";
-  testBtn.className = "btn";
-  document.body.appendChild(testBtn);
-
-  testBtn.addEventListener("click", () => {
-    if (!tg || !tg.sendData) {
-      alert("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.");
-      return;
+  <script>
+    // Helpers: notify
+    let notifyTimer = null;
+    function showNotify(message, duration = 3000) {
+      const notify = document.getElementById("notify");
+      const text = document.getElementById("notifyText");
+      const progress = document.getElementById("notifyProgress");
+      text.textContent = message;
+      progress.style.transition = "none";
+      progress.style.width = "0%";
+      notify.classList.add("show");
+      requestAnimationFrame(() => {
+        progress.style.transition = `width ${duration}ms linear`;
+        progress.style.width = "100%";
+      });
+      clearTimeout(notifyTimer);
+      notifyTimer = setTimeout(hideNotify, duration);
+      notify.onclick = hideNotify;
     }
-    try {
-      tg.sendData("hello from miniapp");
-      alert("✅ داده تست ارسال شد");
-      console.log("[MiniApp] Test data sent.");
-    } catch (err) {
-      console.error("[MiniApp] sendData failed:", err);
-      alert("❌ ارسال تست ناموفق بود");
+    function hideNotify() {
+      const notify = document.getElementById("notify");
+      const progress = document.getElementById("notifyProgress");
+      notify.classList.remove("show");
+      progress.style.transition = "none";
+      progress.style.width = "0%";
+      clearTimeout(notifyTimer);
     }
-  });
 
-  // تابع اجرای ماژول‌ها
-  function exec(section, command) {
-    if (!tg || !tg.sendData) {
-      alert("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.");
-      return;
+    // App data
+    const DATA = {
+      games: [
+        { title: "سنگ‌کاغذ‌قیچی", desc: "شروع بازی کلاسیک در همین گپ", cmd: "/rps" },
+        { title: "Fast Button", desc: "رقابت سرعت با دوستان", cmd: "/fast_button" },
+        { title: "دوز (TicTacToe)", desc: "یک بازی دونفره ساده", cmd: "/tictactoe" },
+        { title: "جرأت و حقیقت", desc: "چالش گروهی جذاب", cmd: "/jorat" }
+      ],
+      tools: [
+        { title: "شناسه من", desc: "دریافت اطلاعات کاربری شما", cmd: "/myid" },
+        { title: "تبدیل متن به ویس", desc: "Text → Voice درجا", cmd: "/txt2voc" }
+      ],
+      general: [
+        { title: "ساعت و تاریخ", desc: "نمایش زمان و تاریخ فعلی", cmd: "/clock" },
+        { title: "راهنما", desc: "راهنمای استفاده از ربات", cmd: "/help" },
+        { title: "درباره", desc: "اطلاعات و لینک‌ها", cmd: "/about" }
+      ]
+    };
+
+    // Render cards + test button
+    function renderSection(name) {
+      const container = document.getElementById("content");
+      container.innerHTML = "";
+
+      const testCard = document.createElement("div");
+      testCard.className = "card";
+      testCard.innerHTML = `
+        <h3>🔎 تست ارسال داده</h3>
+        <p>برای اطمینان از ارتباط Mini App با بات، این دکمه را فشار دهید.</p>
+        <button id="testBtn" class="btn">ارسال hello</button>
+      `;
+      container.appendChild(testCard);
+
+      const items = DATA[name] || [];
+      for (const item of items) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${item.title}</h3>
+          <p>${item.desc}</p>
+          <button class="btn">اجرا</button>
+        `;
+        card.querySelector(".btn").addEventListener("click", () => exec(name, item.cmd));
+        container.appendChild(card);
+      }
     }
-    const payload = { type: "exec", section, command, initData: tg.initData || "" };
-    tg.sendData(JSON.stringify(payload));
-    alert("✅ درخواست اجرا ارسال شد");
-    console.log("[MiniApp] exec sent:", payload);
-  }
-</script>
+
+    function setActiveFooter(sectionName) {
+      document.querySelectorAll(".footer-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-section") === sectionName);
+      });
+    }
+
+    // Theme toggle
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.addEventListener("click", () => {
+      const current = document.body.getAttribute("data-theme") || "light";
+      const next = current === "dark" ? "light" : "dark";
+      document.body.setAttribute("data-theme", next);
+      themeToggle.textContent = next === "dark" ? "☀️ تم روز" : "🌙 تم شب";
+    });
+
+    // Robust WebApp detection and init
+    function getTG() {
+      try {
+        if (typeof window.Telegram === "object" && window.Telegram && typeof window.Telegram.WebApp === "object") {
+          return window.Telegram.WebApp;
+        }
+      } catch (_) {}
+      return null;
+    }
+
+    function isInsideTelegram(tg) {
+      // Consider inside Telegram only if tg exists and has initData or initDataUnsafe
+      return !!(tg && (typeof tg.initData === "string" || (tg.initDataUnsafe && tg.initDataUnsafe.query_id)));
+    }
+
+    let tg = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      tg = getTG();
+
+      if (tg) {
+        try {
+          tg.ready && tg.ready();
+          tg.expand && tg.expand();
+        } catch (e) {
+          console.warn("[MiniApp] tg.ready/expand error:", e);
+        }
+      }
+
+      const banner = document.getElementById("banner");
+      if (!isInsideTelegram(tg)) {
+        // Show banner only if truly outside Telegram (no initData)
+        banner.style.display = "block";
+        console.warn("[MiniApp] WebApp API not fully available. Probably opened in browser or wrong entry.");
+      } else {
+        banner.style.display = "none";
+        console.log("[MiniApp] Telegram WebApp ready. initData length:", (tg.initData || "").length);
+      }
+
+      // Footer nav
+      document.querySelectorAll(".footer-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const section = btn.getAttribute("data-section");
+          setActiveFooter(section);
+          renderSection(section);
+          wireTestButton(); // ensure test button wired each render
+        });
+      });
+
+      // Initial render
+      setActiveFooter("games");
+      renderSection("games");
+      wireTestButton();
+    });
+
+    function wireTestButton() {
+      const btn = document.getElementById("testBtn");
+      if (!btn) return;
+      btn.onclick = () => {
+        tg = getTG(); // re-fetch in case of late init
+        if (!isInsideTelegram(tg) || !tg.sendData) {
+          showNotify("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.", 3000);
+          alert("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.");
+          console.warn("[MiniApp] sendData not available. tg:", tg);
+          return;
+        }
+        try {
+          tg.sendData("hello from miniapp");
+          showNotify("داده تست ارسال شد ✅", 2500);
+          console.log("[MiniApp] Test data sent.");
+        } catch (err) {
+          console.error("[MiniApp] sendData failed:", err);
+          showNotify("❌ ارسال تست ناموفق بود", 2500);
+        }
+      };
+    }
+
+    // Exec payload to bot
+    function exec(section, command) {
+      tg = getTG();
+      if (!isInsideTelegram(tg) || !tg.sendData) {
+        showNotify("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.", 3000);
+        alert("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.");
+        console.warn("[MiniApp] exec aborted. tg:", tg);
+        return;
+      }
+      const payload = { type: "exec", section, command, initData: tg.initData || "" };
+      try {
+        tg.sendData(JSON.stringify(payload));
+        showNotify("درخواست ارسال شد ✅", 3500);
+        console.log("[MiniApp] exec sent:", payload);
+      } catch (err) {
+        console.error("[MiniApp] exec send failed:", err);
+        showNotify("❌ ارسال درخواست ناموفق بود", 3000);
+      }
+    }
+  </script>
 </body>
 </html>
