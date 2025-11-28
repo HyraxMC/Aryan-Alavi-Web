@@ -243,6 +243,15 @@
   <div id="banner" class="banner">❌ این صفحه خارج از تلگرام باز شده است. لطفاً از داخل ربات و دکمه Mini App باز کنید.</div>
 
   <script>
+    const tg = window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
+
+if (tg?.initData && tg.initData.length > 20) {
+  alert("✅ WebApp API فعال شد. طول initData: " + tg.initData.length);
+} else {
+  alert("❌ WebApp API فعال نیست. initData خالیه یا ناقصه.");
+}
     // Helpers: notify
     let notifyTimer = null;
     function showNotify(message, duration = 3000) {
@@ -431,3 +440,4 @@
   </script>
 </body>
 </html>
+
